@@ -2189,12 +2189,46 @@ pub struct Completion {
 
 impl Rados {
     pub fn get_rados_completion(&self) -> RadosResult<Completion> {
-        let mut cb_arg: *mut ::std::os::raw::c_void = ptr::null_mut();
+        let cb_arg: *mut ::std::os::raw::c_void = ptr::null_mut();
 
         unsafe {
             let mut completion: rados_completion_t = ptr::null_mut();
             rados_aio_create_completion(cb_arg, None, None, &mut completion);
             Ok(Completion { completion: completion })
+        }
+    }
+}
+
+impl IoCtx {
+    pub fn rados_object_aio_read(
+        &self,
+        object_name: &str,
+        completion: Completion,
+        fill_buffer: &mut Vec<u8>,
+        read_offset: u64,
+    ) -> RadosResult<i32> {
+        self.ioctx_guard()?;
+        let object_name_str = try!(CString::new(object_name));
+        let mut len = fill_buffer.capacity();
+        if len == 0 {
+            fill_buffer.reserve_exact(1024 * 64);
+            len = fill_buffer.capacity();
+        }
+
+        unsafe {
+            let ret_code = rados_aio_read(
+                self.ioctx,
+                object_name_str.as_ptr(),
+                completion.completion,
+                fill_buffer.as_mut_ptr() as *mut c_char,
+                len,
+                read_offset,
+            );
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code as i32))));
+            }
+            fill_buffer.set_len(ret_code as usize);
+            Ok(ret_code)
         }
     }
 }
