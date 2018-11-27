@@ -318,6 +318,7 @@ pub struct IoCtx {
 }
 
 unsafe impl Sync for IoCtx {}
+unsafe impl Send for IoCtx {}
 
 impl Drop for IoCtx {
     fn drop(&mut self) {
