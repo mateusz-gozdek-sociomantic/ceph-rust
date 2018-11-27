@@ -2229,6 +2229,7 @@ impl IoCtx {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
             //fill_buffer.set_len(ret_code as usize);
+            fill_buffer.set_len(43111 as usize);
             Ok(ret_code)
         }
     }
