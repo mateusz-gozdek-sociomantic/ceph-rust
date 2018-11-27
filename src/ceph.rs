@@ -317,6 +317,8 @@ pub struct IoCtx {
     ioctx: rados_ioctx_t,
 }
 
+unsafe impl Sync for IoCtx {}
+
 impl Drop for IoCtx {
     fn drop(&mut self) {
         if !self.ioctx.is_null() {
