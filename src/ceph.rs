@@ -317,9 +317,6 @@ pub struct IoCtx {
     ioctx: rados_ioctx_t,
 }
 
-unsafe impl Sync for IoCtx {}
-unsafe impl Send for IoCtx {}
-
 impl Drop for IoCtx {
     fn drop(&mut self) {
         if !self.ioctx.is_null() {
@@ -2182,5 +2179,22 @@ impl Rados {
         }
 
         Ok((str_outbuf, str_outs))
+    }
+}
+
+/// Owns a rados handle
+pub struct Completion {
+    completion: rados_completion_t,
+}
+
+impl Rados {
+    pub fn get_rados_completion(&self) -> RadosResult<Completion> {
+        let mut cb_arg: *mut ::std::os::raw::c_void = ptr::null_mut();
+
+        unsafe {
+            let mut completion: rados_completion_t = ptr::null_mut();
+            rados_aio_create_completion(cb_arg, None, None, &mut completion);
+            Ok(Completion { completion: completion })
+        }
     }
 }
