@@ -2203,6 +2203,10 @@ impl Completion {
             }
         }
     }
+
+    pub fn get_return_value(&self) -> i32 {
+        unsafe { rados_aio_get_return_value(self.completion) }
+    }
 }
 
 impl Rados {
