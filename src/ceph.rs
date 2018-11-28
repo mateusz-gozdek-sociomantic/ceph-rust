@@ -2222,7 +2222,7 @@ impl IoCtx {
         &self,
         object_name: &str,
         completion: &mut Completion,
-        fill_buffer: &mut Vec<u8>,
+        fill_buffer: &mut Vec<i8>,
         read_offset: u64,
     ) -> RadosResult<i32> {
         self.ioctx_guard()?;
@@ -2238,7 +2238,7 @@ impl IoCtx {
                 self.ioctx,
                 object_name_str.as_ptr(),
                 completion.completion,
-                fill_buffer.as_mut_ptr() as *mut c_char,
+                fill_buffer.as_mut_ptr(),
                 len,
                 read_offset,
             );
