@@ -2241,6 +2241,7 @@ impl IoCtx {
         }
 
         unsafe {
+            fill_buffer.set_len(size as usize);
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
