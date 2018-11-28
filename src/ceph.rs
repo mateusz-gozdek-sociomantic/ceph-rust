@@ -2247,7 +2247,7 @@ impl IoCtx {
                 object_name_str.as_ptr(),
                 completion.completion,
                 //fill_buffer.as_mut_ptr() as *mut c_char,
-                buff as *mut c_char,
+                buff,
                 1,
                 read_offset,
             );
