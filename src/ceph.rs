@@ -2221,7 +2221,7 @@ impl IoCtx {
     pub fn rados_object_aio_read(
         &self,
         object_name: &str,
-        completion: Completion,
+        completion: &mut Completion,
         fill_buffer: &mut Vec<u8>,
         read_offset: u64,
     ) -> RadosResult<i32> {
