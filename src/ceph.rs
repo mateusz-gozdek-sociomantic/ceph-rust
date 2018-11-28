@@ -2188,9 +2188,19 @@ pub struct Completion {
 }
 
 impl Completion {
-    pub fn is_complete(&self) -> bool {
+    pub fn is_complete(&self) -> RadosResult<bool> {
         unsafe {
-            rados_aio_is_complete(self.completion) != 0
+            let ret_code = rados_aio_is_complete(self.completion);
+
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code))));
+            }
+
+            if ret_code == 0 {
+                return Ok(false);
+            } else {
+                return Ok(true);
+            }
         }
     }
 }
