@@ -2228,9 +2228,11 @@ impl IoCtx {
         self.ioctx_guard()?;
         let object_name_str = try!(CString::new(object_name));
         let mut len = fill_buffer.capacity();
+        println!("Buffer capacity: {}", len);
         if len == 0 {
             fill_buffer.reserve_exact(1024 * 64);
             len = fill_buffer.capacity();
+            println!("New buffer capacity: {}", len);
         }
 
         unsafe {
@@ -2242,6 +2244,7 @@ impl IoCtx {
                 len,
                 read_offset,
             );
+            println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
