@@ -2254,14 +2254,14 @@ impl IoCtx {
         &self,
         object_name: &str,
         completion: &mut Completion,
+        psize: &mut u64,
+        time: &mut i64,
     ) -> RadosResult<i32> {
         self.ioctx_guard()?;
         let object_name_str = try!(CString::new(object_name));
-        let mut psize: u64 = 0;
-        let mut time: ::libc::time_t = 0;
 
         unsafe {
-            let ret_code = rados_aio_stat(self.ioctx, object_name_str.as_ptr(), completion.completion, &mut psize, &mut time);
+            let ret_code = rados_aio_stat(self.ioctx, object_name_str.as_ptr(), completion.completion, psize, time as *mut ::libc::time_t);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
