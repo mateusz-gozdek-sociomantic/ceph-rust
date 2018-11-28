@@ -2224,12 +2224,29 @@ impl IoCtx {
                 len,
                 read_offset,
             );
-            println!("ret_code={}", ret_code);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
-            //fill_buffer.set_len(ret_code as usize);
-            fill_buffer.set_len(43111 as usize);
+            Ok(ret_code)
+        }
+    }
+
+    /// Get object stats (size,SystemTime)
+    pub fn rados_object_aio_stat(
+        &self,
+        object_name: &str,
+        completion: Completion,
+    ) -> RadosResult<i32> {
+        self.ioctx_guard()?;
+        let object_name_str = try!(CString::new(object_name));
+        let mut psize: u64 = 0;
+        let mut time: ::libc::time_t = 0;
+
+        unsafe {
+            let ret_code = rados_aio_stat(self.ioctx, object_name_str.as_ptr(), completion.completion, &mut psize, &mut time);
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code as i32))));
+            }
             Ok(ret_code)
         }
     }
