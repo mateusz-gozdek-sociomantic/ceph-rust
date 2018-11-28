@@ -29,7 +29,7 @@ use rados::*;
 use status::*;
 use std::ffi::{CStr, CString};
 use std::marker::PhantomData;
-use std::{ptr, str};
+use std::{ptr, str, mem};
 
 use std::io::{BufRead, Cursor};
 use std::net::IpAddr;
@@ -2250,11 +2250,11 @@ impl IoCtx {
                 len,
                 read_offset,
             );
+            mem::forget(fill_buffer);
             println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
-            fill_buffer.set_len(size as usize);
             Ok(ret_code)
         }
     }
