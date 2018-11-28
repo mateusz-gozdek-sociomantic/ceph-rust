@@ -2243,7 +2243,7 @@ impl IoCtx {
     pub fn rados_object_aio_stat(
         &self,
         object_name: &str,
-        completion: Completion,
+        completion: &mut Completion,
     ) -> RadosResult<i32> {
         self.ioctx_guard()?;
         let object_name_str = try!(CString::new(object_name));
