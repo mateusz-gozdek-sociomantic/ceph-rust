@@ -2224,6 +2224,7 @@ impl IoCtx {
         completion: &mut Completion,
         fill_buffer: &mut Vec<u8>,
         read_offset: u64,
+        size: u64,
     ) -> RadosResult<i32> {
         self.ioctx_guard()?;
         let object_name_str = try!(CString::new(object_name));
@@ -2248,6 +2249,7 @@ impl IoCtx {
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
+            fill_buffer.set_len(size as usize);
             Ok(ret_code)
         }
     }
