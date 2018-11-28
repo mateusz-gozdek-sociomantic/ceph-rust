@@ -2187,6 +2187,14 @@ pub struct Completion {
     completion: rados_completion_t,
 }
 
+impl Completion {
+    pub fn is_complete(&self) -> bool {
+        unsafe {
+            rados_aio_is_complete(self.completion) == 0
+        }
+    }
+}
+
 impl Rados {
     pub fn get_rados_completion(&self) -> RadosResult<Completion> {
         let cb_arg: *mut ::std::os::raw::c_void = ptr::null_mut();
