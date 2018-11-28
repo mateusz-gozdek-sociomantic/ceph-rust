@@ -2226,32 +2226,31 @@ impl IoCtx {
         &self,
         object_name: &str,
         completion: &mut Completion,
-        fill_buffer: &mut Vec<u8>,
+        //fill_buffer: &mut Vec<u8>,
+        buff: &mut i8,
         read_offset: u64,
-        size: u64,
     ) -> RadosResult<i32> {
         self.ioctx_guard()?;
         let object_name_str = try!(CString::new(object_name));
-        let mut len = fill_buffer.capacity();
-        println!("Buffer capacity: {}", len);
-        if len == 0 {
-            fill_buffer.reserve_exact(1024 * 64);
-            len = fill_buffer.capacity();
-            println!("New buffer capacity: {}", len);
-        }
+        //let mut len = fill_buffer.capacity();
+        //println!("Buffer capacity: {}", len);
+        //if len == 0 {
+        //    fill_buffer.reserve_exact(1024 * 64);
+        //    len = fill_buffer.capacity();
+        //    println!("New buffer capacity: {}", len);
+        //}
 
         unsafe {
-            fill_buffer.set_len(size as usize);
+            //fill_buffer.set_len(size as usize);
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
                 completion.completion,
-                fill_buffer.as_mut_ptr() as *mut c_char,
-                len,
+                //fill_buffer.as_mut_ptr() as *mut c_char,
+                buff as *mut c_char,
+                1,
                 read_offset,
             );
-            mem::forget(fill_buffer);
-            println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
             }
