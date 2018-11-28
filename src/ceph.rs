@@ -2190,7 +2190,7 @@ pub struct Completion {
 impl Completion {
     pub fn is_complete(&self) -> bool {
         unsafe {
-            rados_aio_is_complete(self.completion) == 0
+            rados_aio_is_complete(self.completion) != 0
         }
     }
 }
