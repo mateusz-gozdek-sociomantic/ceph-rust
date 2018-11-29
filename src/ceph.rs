@@ -2251,9 +2251,7 @@ impl IoCtx {
                 //10 as size_t,
                 read_offset,
             );
-            let ten_millis = time::Duration::from_secs(5);
-            thread::sleep(ten_millis);
-            mem::forget(a);
+            while !completion.is_complete().unwrap() {}
             println!("a: {}", a[0]);
             println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
