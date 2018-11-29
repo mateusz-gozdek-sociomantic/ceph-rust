@@ -593,7 +593,7 @@ extern "C" {
         io: rados_ioctx_t,
         oid: *const ::libc::c_char,
         completion: rados_completion_t,
-        buf: *mut *mut ::libc::c_char,
+        buf: *mut ::libc::c_char,
         len: size_t,
         off: uint64_t,
     ) -> ::libc::c_int;
