@@ -2240,20 +2240,30 @@ impl IoCtx {
         }
 
         unsafe {
-            let mut a: [c_char; 1000] = [0; 1000];
+            let mut buf = vec![0u8; 1000];
+            //buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
+            //Ok(String::from_utf8_lossy(&buf).into_owned())
+
+            //let mut a: [c_char; 1000] = [0; 1000];
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
                 completion.completion,
                 //fill_buffer.as_mut_ptr() as *mut c_char,
                 //&a[0] as *mut c_char,
-                a[0] as *mut c_char,
-                len as size_t,
+                //&mut a[0] as *const c_char,
+                buf.as_mut_ptr() as *mut c_char,
+                //len as size_t,
                 //10 as size_t,
+                1000 as size_t,
                 read_offset,
             );
             while !completion.is_complete().unwrap() {}
-            println!("a: {}{}{}{}{}", a[0], a[1], a[2], a[3], a[4]);
+            //println!("a: {}{}{}{}{}", a[0], a[1], a[2], a[3], a[4]);
+            buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
+            println!("buf: {:?}", buf);
+            let a = String::from_utf8_lossy(&buf).into_owned();
+            println!("String from buf: {:?}", a);
             println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
