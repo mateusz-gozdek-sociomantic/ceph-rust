@@ -2240,7 +2240,8 @@ impl IoCtx {
         }
 
         unsafe {
-            let mut buf = vec![0u8; 1000];
+            //let mut buf = vec![0u8; 1000];
+            let mut buffer: Vec<u8> = Vec::with_capacity(1000);
             //buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
             //Ok(String::from_utf8_lossy(&buf).into_owned())
 
@@ -2252,7 +2253,7 @@ impl IoCtx {
                 //fill_buffer.as_mut_ptr() as *mut c_char,
                 //&a[0] as *mut c_char,
                 //&mut a[0] as *const c_char,
-                buf.as_mut_ptr() as *mut c_char,
+                buffer.as_mut_ptr() as *mut c_char,
                 //len as size_t,
                 //10 as size_t,
                 1000 as size_t,
@@ -2260,9 +2261,14 @@ impl IoCtx {
             );
             while !completion.is_complete().unwrap() {}
             //println!("a: {}{}{}{}{}", a[0], a[1], a[2], a[3], a[4]);
-            buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
-            println!("buf: {:?}", buf);
-            let a = String::from_utf8_lossy(&buf).into_owned();
+            //buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
+            buffer.set_len(1000);
+            println!("buf: {:?}", buffer);
+            let num_bytes = buffer.iter().position(|x| x == &0u8);
+            println!("num_bytes: {:?}", num_bytes);
+            buffer.set_len(num_bytes.unwrap_or(0));
+            println!("buf: {:?}", buffer);
+            let a = String::from_utf8_lossy(&buffer).into_owned();
             println!("String from buf: {:?}", a);
             println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
