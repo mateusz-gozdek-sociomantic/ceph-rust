@@ -2241,13 +2241,14 @@ impl IoCtx {
         //}
 
         unsafe {
+            let len: size_t = 9463;
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
                 completion.completion,
                 fill_buffer.as_mut_ptr() as *mut c_char,
                 //len as size_t,
-                9463 as size_t,
+                len,
                 read_offset,
             );
             println!("rados_aio_read returned {}", ret_code);
