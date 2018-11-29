@@ -2239,8 +2239,8 @@ impl IoCtx {
             println!("New buffer capacity: {}", len);
         }
 
-        let mut buffer: Vec<u8> = Vec::with_capacity(1000);
-        //let mut buffer: Vec<u8> = vec![0u8; 1000];
+        //let mut buffer: Vec<u8> = Vec::with_capacity(1000);
+        let mut buffer: Vec<u8> = vec![0; 1000];
         //let mut buffer2: [u8; 1000] = [0; 1000];
         unsafe {
             //let mut buf = vec![0u8; 1000];
