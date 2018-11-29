@@ -2255,7 +2255,7 @@ impl IoCtx {
                 //&a[0] as *mut c_char,
                 //&mut a[0] as *const c_char,
                 //buffer.as_mut_ptr() as *mut c_char,
-                buffer2.as_mut_ptr() as *mut c_char,
+                buffer2[0] as *mut c_char,
                 //len as size_t,
                 //10 as size_t,
                 1000 as size_t,
