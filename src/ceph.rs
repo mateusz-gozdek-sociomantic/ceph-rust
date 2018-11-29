@@ -2240,7 +2240,7 @@ impl IoCtx {
         }
 
         unsafe {
-            let a: [c_char; 10] = [0; 10];
+            let a: [c_char; 10000] = [0; 10000];
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
