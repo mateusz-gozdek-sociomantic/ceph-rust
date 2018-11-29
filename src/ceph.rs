@@ -2245,7 +2245,7 @@ impl IoCtx {
                 object_name_str.as_ptr(),
                 completion.completion,
                 fill_buffer.as_mut_ptr() as *mut c_char,
-                len,
+                len as size_t,
                 read_offset,
             );
             println!("rados_aio_read returned {}", ret_code);
