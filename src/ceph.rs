@@ -2240,11 +2240,13 @@ impl IoCtx {
         }
 
         unsafe {
+            let mut a: [c_char; 10] = [0; 10];
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
                 completion.completion,
-                fill_buffer.as_mut_ptr() as *mut c_char,
+                //fill_buffer.as_mut_ptr() as *mut c_char,
+                a[0] as *mut c_char,
                 len as size_t,
                 read_offset,
             );
