@@ -2247,7 +2247,7 @@ impl IoCtx {
                 completion.completion,
                 //fill_buffer.as_mut_ptr() as *mut c_char,
                 //&a[0] as *mut c_char,
-                &mut a[0] as *mut c_char,
+                a[0] as *mut c_char,
                 len as size_t,
                 //10 as size_t,
                 read_offset,
