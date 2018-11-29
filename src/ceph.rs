@@ -2251,7 +2251,7 @@ impl IoCtx {
                 //10 as size_t,
                 read_offset,
             );
-            let ten_millis = time::Duration::from_millis(50);
+            let ten_millis = time::Duration::from_secs(5);
             thread::sleep(ten_millis);
             mem::forget(a);
             println!("a: {}", a[0]);
