@@ -2262,7 +2262,7 @@ impl IoCtx {
             while !completion.is_complete().unwrap() {}
             //println!("a: {}{}{}{}{}", a[0], a[1], a[2], a[3], a[4]);
             //buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
-            buffer.set_len(1000);
+            //buffer.set_len(1000);
             //println!("buf: {:?}", buffer);
             //let num_bytes = buffer.iter().position(|x| x == &0u8);
             //println!("num_bytes: {:?}", num_bytes);
