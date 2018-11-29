@@ -2240,7 +2240,7 @@ impl IoCtx {
         }
 
         unsafe {
-            let mut a: [c_char; 10000] = [0; 10000];
+            let mut a: [c_char; 1000] = [0; 1000];
             let ret_code = rados_aio_read(
                 self.ioctx,
                 object_name_str.as_ptr(),
@@ -2253,7 +2253,7 @@ impl IoCtx {
                 read_offset,
             );
             while !completion.is_complete().unwrap() {}
-            println!("a: {}", a[0]);
+            println!("a: {}{}{}{}{}", a[0], a[1], a[2], a[3], a[4]);
             println!("rados_aio_read returned {}", ret_code);
             if ret_code < 0 {
                 return Err(RadosError::new(try!(get_error(ret_code as i32))));
