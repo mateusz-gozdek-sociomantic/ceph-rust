@@ -2263,14 +2263,10 @@ impl IoCtx {
                 read_offset,
             );
             while !completion.is_complete().unwrap() {}
-            println!("buffer: {:?}", buffer);
+            //println!("buffer: {:?}", buffer);
             //println!("a: {}{}{}{}{}", a[0], a[1], a[2], a[3], a[4]);
             //buf = buf.iter().take_while(|&x| x != &0u8).cloned().collect();
             buffer.set_len(1000);
-            println!("buffer: {:?}", buffer);
-            let num_bytes = buffer.iter().position(|x| x == &0u8);
-            println!("num_bytes: {:?}", num_bytes);
-            buffer.set_len(num_bytes.unwrap_or(0));
             println!("buffer: {:?}", buffer);
             //let a = String::from_utf8_lossy(&buffer).into_owned();
             //println!("String from buf: {:?}", a);
