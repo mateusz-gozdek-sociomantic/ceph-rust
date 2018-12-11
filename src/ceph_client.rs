@@ -43,7 +43,7 @@ macro_rules! min_version {
 
 impl CephClient {
     pub fn new<T1: AsRef<str>, T2: AsRef<str>>(user_id: T1, config_file: T2) -> Result<CephClient, RadosError> {
-        let rados_t = match connect_to_ceph(&user_id.as_ref(), &config_file.as_ref()) {
+        let rados_t = match connect_to_ceph(user_id.as_ref(), config_file.as_ref()) {
             Ok(rados_t) => rados_t,
             Err(e) => return Err(e.into()),
         };

@@ -330,6 +330,7 @@ impl Drop for IoCtx {
 /// Owns a rados handle
 pub struct Rados {
     rados: rados_t,
+    connected: bool,
     phantom: PhantomData<IoCtx>,
 }
 
@@ -347,6 +348,15 @@ impl Drop for Rados {
 
 /// Connect to a Ceph cluster and return a connection handle rados_t
 pub fn connect_to_ceph<'a>(user_id: &str, config_file: &str) -> RadosResult<Rados> {
+    let mut rados = match parse_config(user_id, config_file) {
+        Ok(rados) => rados,
+        Err(err)  => return Err(err),
+    };
+    rados.connect_to_ceph()
+}
+
+// Parses config files and return a connection handler, which is not connected.
+pub fn parse_config<'a>(user_id: &str, config_file: &str) -> RadosResult<Rados> {
     let connect_id = try!(CString::new(user_id));
     let conf_file = try!(CString::new(config_file));
     unsafe {
@@ -359,12 +369,9 @@ pub fn connect_to_ceph<'a>(user_id: &str, config_file: &str) -> RadosResult<Rado
         if ret_code < 0 {
             return Err(RadosError::new(try!(get_error(ret_code))));
         }
-        let ret_code = rados_connect(cluster_handle);
-        if ret_code < 0 {
-            return Err(RadosError::new(try!(get_error(ret_code))));
-        }
         Ok(Rados {
             rados: cluster_handle,
+            connected: false,
             phantom: PhantomData,
         })
     }
@@ -379,7 +386,7 @@ impl Rados {
     /// For clean up, this is only necessary after connect_to_ceph() has
     /// succeeded.
     pub fn disconnect_from_ceph(&self) {
-        if self.rados.is_null() {
+        if !self.connected {
             // No need to do anything
             return;
         }
@@ -388,8 +395,23 @@ impl Rados {
         }
     }
 
+    /// Connect to a Ceph cluster and return a connection handle rados_t
+    pub fn connect_to_ceph(&mut self) -> RadosResult<Rados> {
+        if !self.connected {
+            unsafe {
+                let ret_code = rados_connect(self.rados);
+                if ret_code < 0 {
+                    return Err(RadosError::new(try!(get_error(ret_code))));
+                } else {
+                    self.connected = true;
+                };
+            };
+        }
+        Ok(*self)
+    }
+
     fn conn_guard(&self) -> RadosResult<()> {
-        if self.rados.is_null() {
+        if !self.connected {
             return Err(RadosError::new(
                 "Rados not connected.  Please initialize cluster".to_string(),
             ));
@@ -399,7 +421,7 @@ impl Rados {
 
     /// Set the value of a configuration option
     pub fn config_set(&self, name: &str, value: &str) -> RadosResult<()> {
-        if !self.rados.is_null() {
+        if self.connected {
             return Err(RadosError::new(
                 "Rados should not be connected when this function is called".into(),
             ));
