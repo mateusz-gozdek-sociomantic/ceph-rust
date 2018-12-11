@@ -482,6 +482,19 @@ impl Rados {
             Ok(IoCtx { ioctx: ioctx })
         }
     }
+
+    pub fn get_rados_completion(&self) -> RadosResult<Completion> {
+        let cb_arg: *mut ::std::os::raw::c_void = ptr::null_mut();
+        let mut completion: rados_completion_t = ptr::null_mut();
+        unsafe {
+            let ret_code = rados_aio_create_completion(cb_arg, None, None, &mut completion);
+
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code))));
+            }
+        }
+        Ok(Completion { completion: completion })
+    }
 }
 
 impl IoCtx {
@@ -1492,6 +1505,57 @@ impl IoCtx {
         }
         Ok(())
     }
+
+    pub fn rados_object_aio_read(
+        &self,
+        object_name: &str,
+        completion: &mut Completion,
+        fill_buffer: &mut Vec<u8>,
+        read_offset: u64,
+    ) -> RadosResult<i32> {
+        self.ioctx_guard()?;
+        let object_name_str = try!(CString::new(object_name));
+        let mut len = fill_buffer.capacity();
+        if len == 0 {
+            fill_buffer.reserve_exact(1024 * 64);
+            len = fill_buffer.capacity();
+        }
+
+        unsafe {
+            let ret_code = rados_aio_read(
+                self.ioctx,
+                object_name_str.as_ptr(),
+                completion.completion,
+                fill_buffer.as_mut_ptr() as *mut c_char,
+                len as size_t,
+                read_offset,
+            );
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code as i32))));
+            }
+            Ok(ret_code)
+        }
+    }
+
+    /// Get object stats (size,SystemTime)
+    pub fn rados_object_aio_stat(
+        &self,
+        object_name: &str,
+        completion: &mut Completion,
+        psize: &mut u64,
+        time: &mut i64,
+    ) -> RadosResult<i32> {
+        self.ioctx_guard()?;
+        let object_name_str = try!(CString::new(object_name));
+
+        unsafe {
+            let ret_code = rados_aio_stat(self.ioctx, object_name_str.as_ptr(), completion.completion, psize, time as *mut ::libc::time_t);
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code as i32))));
+            }
+            Ok(ret_code)
+        }
+    }
 }
 
 impl Rados {
@@ -2192,5 +2256,40 @@ impl Rados {
         }
 
         Ok((str_outbuf, str_outs))
+    }
+}
+
+/// Owns a rados handle
+pub struct Completion {
+    completion: rados_completion_t,
+}
+
+impl Completion {
+    pub fn is_complete(&self) -> RadosResult<bool> {
+        unsafe {
+            let ret_code = rados_aio_is_complete(self.completion);
+
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code))));
+            }
+
+            if ret_code == 0 {
+                return Ok(false);
+            } else {
+                return Ok(true);
+            }
+        }
+    }
+
+    pub fn get_return_value(&self) -> RadosResult<i32> {
+        unsafe {
+            let ret_code = rados_aio_get_return_value(self.completion);
+
+            if ret_code < 0 {
+                return Err(RadosError::new(try!(get_error(ret_code))));
+            }
+
+            Ok(ret_code)
+        }
     }
 }
