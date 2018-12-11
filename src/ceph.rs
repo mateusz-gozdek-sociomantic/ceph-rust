@@ -328,6 +328,7 @@ impl Drop for IoCtx {
 }
 
 /// Owns a rados handle
+#[derive(Copy, Clone)]
 pub struct Rados {
     rados: rados_t,
     connected: bool,
@@ -335,16 +336,6 @@ pub struct Rados {
 }
 
 unsafe impl Sync for Rados{}
-
-impl Drop for Rados {
-    fn drop(&mut self) {
-        if !self.rados.is_null() {
-            unsafe {
-                rados_shutdown(self.rados);
-            }
-        }
-    }
-}
 
 /// Connect to a Ceph cluster and return a connection handle rados_t
 pub fn connect_to_ceph<'a>(user_id: &str, config_file: &str) -> RadosResult<Rados> {
