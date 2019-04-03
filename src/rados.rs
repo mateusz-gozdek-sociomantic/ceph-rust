@@ -887,6 +887,12 @@ extern "C" {
         client_address: *mut ::libc::c_char,
         expire_seconds: uint32_t,
     ) -> ::libc::c_int;
+    pub fn rados_service_register(
+        cluster: rados_t,
+        service: *const ::libc::c_char,
+        daemon: *const ::libc::c_char,
+        metadata_dict: *const ::libc::c_char,
+    ) -> ::libc::c_int;
     pub fn rados_mon_command(
         cluster: rados_t,
         cmd: *mut *const ::libc::c_char,
